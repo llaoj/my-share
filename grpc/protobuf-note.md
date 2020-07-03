@@ -1,6 +1,6 @@
-## Message Type
+[Protocol Buffers Overview](https://developers.google.com/protocol-buffers/docs/overview)
 
-### field number
+### Field number
 - 1 1-15 占 1byte 存field number & field's type
 - 2 16-2047 占 2bytes
 - 3 smallest: 1
@@ -8,12 +8,12 @@
 - 5 不能用 reserved field numbers
 - x 19000-19999为系统保留, 不能用
 
-### field rules
+### Field rules
 - 6 一旦指定required 就不要改了
 - 7 为了防止依赖膨胀, 尽量不要在一个proto文件中定义大量有依赖关系的message
 - 8 不要删除或者注释field, 用reserved
 
-### field type
+### Field type
 - 9 enum 使用varint encoding 赋值效率不高不建议使用
 - 10 groups 已经废弃, 不要使用, 请用nested类型(message 嵌套)
 
@@ -45,5 +45,3 @@ message MapFieldEntry {
 
 repeated MapFieldEntry map_field = N;
 ```
-
-- 24 
