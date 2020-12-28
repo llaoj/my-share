@@ -51,21 +51,26 @@ spec:
         kubernetes.io/os: linux
       containers:
       - name: metrics-server
-        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
+        # image: k8s.gcr.io/metrics-server-amd64:v0.3.6
+        image: registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server-amd64:v0.3.6
+        imagePullPolicy: IfNotPresent
         command:
         - /metrics-server
         - --metric-resolution=30s
+        - --kubelet-insecure-tls
+        - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
         # These are needed for GKE, which doesn't support secure communication yet.
         # Remove these lines for non-GKE clusters, and when GKE supports token-based auth.
-        - --kubelet-port=10255
-        - --deprecated-kubelet-completely-insecure=true
-        - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+        # - --kubelet-port=10255
+        # - --deprecated-kubelet-completely-insecure=true
         ports:
         - containerPort: 443
           name: https
           protocol: TCP
       - name: metrics-server-nanny
-        image: k8s.gcr.io/addon-resizer:1.8.11
+        # image: k8s.gcr.io/addon-resizer:1.8.11
+        image: registry.cn-hangzhou.aliyuncs.com/google_containers/addon-resizer:1.8.11
+        imagePullPolicy: IfNotPresent
         resources:
           limits:
             cpu: 100m
@@ -88,10 +93,10 @@ spec:
         command:
           - /pod_nanny
           - --config-dir=/etc/config
-          - --cpu={{ base_metrics_server_cpu }}
-          - --extra-cpu=0.5m
-          - --memory={{ base_metrics_server_memory }}
-          - --extra-memory={{ metrics_server_memory_per_node }}Mi
+          - --cpu=20m
+          - --extra-cpu=1m
+          - --memory=60Mi
+          - --extra-memory=3Mi
           - --threshold=5
           - --deployment=metrics-server-v0.3.6
           - --container=metrics-server
@@ -99,7 +104,7 @@ spec:
           - --estimator=exponential
           # Specifies the smallest cluster (defined in number of nodes)
           # resources will be scaled to.
-          - --minClusterSize={{ metrics_server_min_cluster_size }}
+          - --minClusterSize=5
           # Use kube-apiserver metrics to avoid periodically listing nodes.
           - --use-metrics=true
       volumes:
